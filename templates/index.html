@@ -9,7 +9,8 @@
    <body>
        <ul id="messages"></ul>
        <form id="form" action="">
-           <input id="input" autocomplete="off" /><button>Enviar</button>
+           <input id="name" placeholder="Nome" autocomplete="off" />
+           <input id="input" placeholder="Digite sua mensagem" autocomplete="off" /><button>Enviar</button>
        </form>
 
        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.4/socket.io.js"></script>
@@ -17,14 +18,25 @@
            var socket = io.connect('http://' + document.domain + ':' + location.port);
 
            socket.on('message', function(msg) {
+                // console.log(msg);
                var ul = document.getElementById('messages');
                var li = document.createElement('li');
-               li.appendChild(document.createTextNode(msg));
-               ul.appendChild(li);
+                //    li.appendChild(document.createTextNode(`<strong>${msg.nome}</strong>: ${msg.message}`));
+                li.innerHTML = `<strong>${msg.nome}</strong>: ${msg.message}`
+                ul.appendChild(li);
            });
 
            document.getElementById('form').onsubmit = function() {
-               socket.emit('message', document.getElementById('input').value);
+               nome = document.getElementById('name').value
+               message = document.getElementById('input').value
+
+               if (nome == '' || message == '') {
+                   alert('Preencha todos os campos');
+                   return false
+               }
+                  
+               socket.emit('message', {nome : document.getElementById('name').value,
+                                        message: document.getElementById('input').value});
                document.getElementById('input').value = '';
                return false;
            };
